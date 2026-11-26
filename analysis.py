@@ -114,7 +114,23 @@ industry_summary = spark.sql("""
 """)
 
 print("\nInsurance Performance by Industry:")
-industry_summary.show()
+
+industry_summary.select(
+    "industry",
+    "total_policies",
+    F.format_number("total_premium", 2).alias("total_premium"),
+    "total_claims",
+    F.format_number("total_losses", 2).alias("total_losses"),
+    F.concat(
+        F.format_number(F.col("claim_frequency") * 100, 2),
+        F.lit("%")
+    ).alias("claim_frequency"),
+    F.format_number("claim_severity", 2).alias("claim_severity"),
+    F.concat(
+        F.format_number(F.col("loss_ratio") * 100, 2),
+        F.lit("%")
+    ).alias("loss_ratio")
+).show(truncate=False)
 
 # 10. Create state-to-region mapping
 regions = spark.sql("""
